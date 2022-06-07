@@ -3,6 +3,7 @@ package com.codepath.apps.restclienttemplate.adapters;
 import android.content.Context;
 import android.media.Image;
 import android.text.Layout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,27 +58,36 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         ImageView ivProfileImage;
         TextView tvBody;
         TextView tvScreenName;
+        ImageView tvMedia;
         public ViewHolder(@NonNull View itemView){ // one tweet
             super(itemView);
             ivProfileImage = itemView.findViewById(R.id.ivProfileImage);
             tvBody = itemView.findViewById(R.id.tvBody);
             tvScreenName = itemView.findViewById(R.id.tvScreenName);
+            tvMedia = itemView.findViewById(R.id.tvEmbedImg);
         }
 
         public void bind(Tweet tweet) {
             tvBody.setText(tweet.body);
             tvScreenName.setText(tweet.user.screenName);
             Glide.with(context).load(tweet.user.profileImageUrl).into(ivProfileImage);
+            Log.d("TweetsAdapter", "profile img url: " + tweet.user.profileImageUrl);
+            if (tweet.imgUrl != null){
+                Glide.with(context).load(tweet.imgUrl).centerCrop().into(tvMedia);
+                Log.d("TweetsAdapter", "non null imgurl: " + tweet.imgUrl);
+            } else {
+                tvMedia.setVisibility(android.view.View.GONE);
+            }
         }
     }
 
     public void clear() {
         tweets.clear();
-        notifyDataSetChanged();
+        this.notifyDataSetChanged();
     }
 
     public void addAll(List<Tweet> list){
         tweets.addAll(list);
-        notifyDataSetChanged();
+        this.notifyDataSetChanged();
     }
 }
