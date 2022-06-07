@@ -1,6 +1,7 @@
 package com.codepath.apps.restclienttemplate.adapters;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.media.Image;
 import android.text.Layout;
 import android.util.Log;
@@ -14,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 
@@ -55,6 +57,8 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
 
     // define a viewholder
     public class ViewHolder extends RecyclerView.ViewHolder {
+        final int MEDIA_HEIGHT = (int) (Resources.getSystem().getDisplayMetrics().heightPixels / 4);
+        final int CORNER_RADIUS = 20;
         ImageView ivProfileImage;
         TextView tvBody;
         TextView tvScreenName;
@@ -65,15 +69,23 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             tvBody = itemView.findViewById(R.id.tvBody);
             tvScreenName = itemView.findViewById(R.id.tvScreenName);
             tvMedia = itemView.findViewById(R.id.tvEmbedImg);
+            ViewGroup.LayoutParams tvMediaParams = tvMedia.getLayoutParams();
+            tvMediaParams.height = MEDIA_HEIGHT;
+            tvMedia.setLayoutParams(tvMediaParams);
         }
 
         public void bind(Tweet tweet) {
             tvBody.setText(tweet.body);
             tvScreenName.setText(tweet.user.screenName);
-            Glide.with(context).load(tweet.user.profileImageUrl).into(ivProfileImage);
+            Glide.with(context).load(tweet.user.profileImageUrl)
+                    .transform(new RoundedCorners(CORNER_RADIUS))
+                    .into(ivProfileImage);
             Log.d("TweetsAdapter", "profile img url: " + tweet.user.profileImageUrl);
             if (tweet.imgUrl != null){
-                Glide.with(context).load(tweet.imgUrl).centerCrop().into(tvMedia);
+                Glide.with(context).load(tweet.imgUrl)
+                        .centerCrop()
+                        .transform(new RoundedCorners(CORNER_RADIUS))
+                        .into(tvMedia);
                 Log.d("TweetsAdapter", "non null imgurl: " + tweet.imgUrl);
             } else {
                 tvMedia.setVisibility(android.view.View.GONE);
