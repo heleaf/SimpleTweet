@@ -14,11 +14,11 @@ The following **required** functionality is completed:
   * [ ] User is displayed the [relative timestamp](https://gist.github.com/nesquena/f786232f5ef72f6e10a7) for each tweet "8m", "7h"
 * [ ] User can **compose and post a new tweet**
   * [x] User can click a “Compose” icon in the Action Bar on the top right
-  * [ ] User can then enter a new tweet and post this to Twitter
+  * [x] User can then enter a new tweet and post this to Twitter
   * [ ] User is taken back to home timeline with **new tweet visible** in timeline
   * [ ] Newly created tweet should be manually inserted into the timeline and not rely on a full refresh
-* [ ] User can **see a counter with total number of characters left for tweet** on compose tweet page
-* [ ] User can **pull down to refresh tweets timeline**
+* [x] User can **see a counter with total number of characters left for tweet** on compose tweet page
+* [x] User can **pull down to refresh tweets timeline**
 * [ ] User can **see embedded image media within a tweet** on list or detail view.
 
 The following **optional** features are implemented:
