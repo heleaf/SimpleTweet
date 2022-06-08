@@ -1,6 +1,5 @@
 package com.codepath.apps.restclienttemplate;
 
-import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -13,9 +12,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.codepath.apps.restclienttemplate.adapters.TweetsAdapter;
 import com.codepath.apps.restclienttemplate.models.Tweet;
@@ -143,7 +140,7 @@ public class TimelineActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         if (item.getItemId() == R.id.compose){
-            Toast.makeText(this, "Compose", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this, "Compose", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(this, ComposeActivity.class);
 
             // child activity gives back a submitted tweet if user submits

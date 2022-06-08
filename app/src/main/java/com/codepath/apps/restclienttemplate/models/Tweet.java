@@ -1,9 +1,6 @@
 package com.codepath.apps.restclienttemplate.models;
 
 import android.util.Log;
-
-import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,7 +17,7 @@ public class Tweet {
     public User user;
     public String imgUrl;
 
-    public Tweet(){}; // empty constructor needed by parceler library
+    public Tweet(){} // empty constructor needed by parceler library
 
     public static Tweet fromJson(JSONObject jsonObject) throws JSONException {
         Tweet tweet = new Tweet();

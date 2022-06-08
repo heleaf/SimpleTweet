@@ -2,8 +2,6 @@ package com.codepath.apps.restclienttemplate.adapters;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.media.Image;
-import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -57,7 +55,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
 
     // define a viewholder
     public class ViewHolder extends RecyclerView.ViewHolder {
-        final int MEDIA_HEIGHT = (int) (Resources.getSystem().getDisplayMetrics().heightPixels / 4);
+        final int MEDIA_HEIGHT = (Resources.getSystem().getDisplayMetrics().heightPixels / 4);
         final int CORNER_RADIUS = 20;
         ImageView ivProfileImage;
         TextView tvBody;
