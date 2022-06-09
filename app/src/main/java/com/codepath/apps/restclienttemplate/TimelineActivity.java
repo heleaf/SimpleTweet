@@ -1,6 +1,7 @@
 package com.codepath.apps.restclienttemplate;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,6 +28,14 @@ import java.util.List;
 
 import okhttp3.Headers;
 
+/* TODO: implement onclick?
+* like, retweet, and reply?
+* client.likeTweet(....)
+* client.retweet(....)
+* client.replyTweet(....)
+* */
+
+
 public class TimelineActivity extends AppCompatActivity {
 
     public static final String TAG = "TimelineActivity";
@@ -37,7 +46,7 @@ public class TimelineActivity extends AppCompatActivity {
     RecyclerView rvTweets;
     List<Tweet> tweets;
     TweetsAdapter adapter;
-    ImageView logOut;
+//    ImageView logOut;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,13 +82,14 @@ public class TimelineActivity extends AppCompatActivity {
         rvTweets.setLayoutManager(new LinearLayoutManager(this));
         rvTweets.setAdapter(adapter);
 
-        logOut = findViewById(R.id.logOutButton);
-        logOut.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onLogoutButton();
-            }
-        });
+//        logOut = findViewById(R.id.logOutButton);
+//        logOut.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                onLogoutButton();
+//            }
+//        });
+
 
         populateHomeTimeline();
     }
@@ -145,6 +155,10 @@ public class TimelineActivity extends AppCompatActivity {
 
             // child activity gives back a submitted tweet if user submits
             startActivityForResult(intent, REQUEST_CODE);
+            return true;
+        }
+        if (item.getItemId() == R.id.logOutFromMenu){
+            onLogoutButton();
             return true;
         }
         return super.onOptionsItemSelected(item);

@@ -20,6 +20,9 @@ public class Tweet {
     public String createdAt;
     public User user;
     public String imgUrl;
+    public boolean favorited;
+    public boolean retweeted;
+    public String id;
 
     public Tweet(){} // empty constructor needed by parceler library
 
@@ -28,13 +31,15 @@ public class Tweet {
         tweet.body = jsonObject.getString("text");
         tweet.createdAt = jsonObject.getString("created_at");
         tweet.user = User.fromJson(jsonObject.getJSONObject("user"));
-
+        tweet.favorited = jsonObject.getBoolean("favorited");
+        tweet.retweeted = jsonObject.getBoolean("retweeted");
+        tweet.id = jsonObject.getString("id_str");
         JSONObject entities = jsonObject.getJSONObject("entities");
         if (entities.has("media")){
             JSONObject img = entities.getJSONArray("media").getJSONObject(0);
             tweet.imgUrl = img.getString("media_url_https");
         } else tweet.imgUrl = null;
-        Log.d("Tweet", "imgurl: " + tweet.imgUrl);
+//        Log.d("Tweet", "imgurl: " + tweet.imgUrl);
         return tweet;
     }
 
