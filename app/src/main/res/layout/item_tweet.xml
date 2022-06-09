@@ -21,7 +21,6 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
         android:text="@string/at_sign"
-        app:layout_constraintEnd_toStartOf="@+id/relativeTimeStamp"
         app:layout_constraintStart_toEndOf="@+id/tvName"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="test username" />
@@ -66,6 +65,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
+        android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@+id/ivProfileImage"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="test name" />

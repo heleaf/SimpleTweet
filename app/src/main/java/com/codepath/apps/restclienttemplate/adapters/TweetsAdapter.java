@@ -116,7 +116,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         TextView relativeTimeStamp;
 
         ImageView likeButton;
-        ImageView reblogButton;
+        ImageView retweetButton;
         ImageView replyButton;
 
         public ViewHolder(@NonNull View itemView){ // one tweet
@@ -132,7 +132,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             relativeTimeStamp = itemView.findViewById(R.id.relativeTimeStamp);
 
             likeButton = itemView.findViewById(R.id.likeTweetButton);
-            reblogButton = itemView.findViewById(R.id.reblogTweetButton);
+            retweetButton = itemView.findViewById(R.id.reblogTweetButton);
             replyButton = itemView.findViewById(R.id.replyTweetButton);
         }
 
@@ -179,6 +179,29 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                     });
                 }
             });
+
+            retweetButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    client.retweet(tweet.id, new JsonHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Headers headers, JSON json) {
+                            Log.d("TweetsAdapter", "successfully retweeted");
+                            // notify data set changed?
+                            notifyItemInserted(0);
+                            retweetButton.setImageResource(R.drawable.ic_vector_retweet);
+                        }
+                        @Override
+                        public void onFailure(int statusCode, Headers headers,
+                                              String response, Throwable throwable) {
+                            Log.e("TweetsAdapter", "failed to retweet: " + response,
+                                    throwable);
+
+                        }
+                    });
+                }
+            });
+
         }
     }
 
