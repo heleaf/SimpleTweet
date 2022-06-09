@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+        <item android:state_selected="true" android:color="@color/twitter_blue" android:drawable="@drawable/ic_vector_retweet"/>
+        <item android:drawable="@drawable/ic_vector_retweet_stroke"/>
+
+<!--        <item android:color="@color/twitter_blue" android:state_selected="true"></item>-->
+<!--        <item android:color="@color/medium_gray" />-->
+</selector>

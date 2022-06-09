@@ -1,8 +1,8 @@
 package com.codepath.apps.restclienttemplate.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
-import android.media.Image;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,12 +16,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.codepath.apps.restclienttemplate.R;
+import com.codepath.apps.restclienttemplate.TweetDetailActivity;
 import com.codepath.apps.restclienttemplate.TwitterApp;
 import com.codepath.apps.restclienttemplate.TwitterClient;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 
-import org.json.JSONException;
+import org.parceler.Parcels;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -30,7 +31,7 @@ import java.util.Locale;
 
 import okhttp3.Headers;
 
-public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder> {
+public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder>{
 
     // pass in context and list of tweets
     TwitterClient client;
@@ -105,7 +106,8 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         return "";
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+
+    public class ViewHolder extends RecyclerView.ViewHolder{
         final int MEDIA_HEIGHT = (Resources.getSystem().getDisplayMetrics().heightPixels / 4);
         final int CORNER_RADIUS = 20;
         ImageView ivProfileImage;
@@ -121,19 +123,35 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
 
         public ViewHolder(@NonNull View itemView){ // one tweet
             super(itemView);
-            ivProfileImage = itemView.findViewById(R.id.ivProfileImage);
-            tvBody = itemView.findViewById(R.id.tvBody);
-            tvName = itemView.findViewById(R.id.tvName);
-            tvScreenName = itemView.findViewById(R.id.tvUserName);
-            tvMedia = itemView.findViewById(R.id.tvEmbedImg);
+            ivProfileImage = itemView.findViewById(R.id.detailProfileImg);
+            tvBody = itemView.findViewById(R.id.detailBody);
+            tvName = itemView.findViewById(R.id.detailName);
+            tvScreenName = itemView.findViewById(R.id.detailUserName);
+            tvMedia = itemView.findViewById(R.id.detailEmbImg);
             ViewGroup.LayoutParams tvMediaParams = tvMedia.getLayoutParams();
             tvMediaParams.height = MEDIA_HEIGHT;
             tvMedia.setLayoutParams(tvMediaParams);
-            relativeTimeStamp = itemView.findViewById(R.id.relativeTimeStamp);
+            relativeTimeStamp = itemView.findViewById(R.id.detailTimeStamp);
 
-            likeButton = itemView.findViewById(R.id.likeTweetButton);
-            retweetButton = itemView.findViewById(R.id.reblogTweetButton);
-            replyButton = itemView.findViewById(R.id.replyTweetButton);
+            likeButton = itemView.findViewById(R.id.detailLikeButton);
+            retweetButton = itemView.findViewById(R.id.detailRetweetButton);
+            replyButton = itemView.findViewById(R.id.detailReplyButton);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int pos = getAdapterPosition();
+                    Log.d("TweetsAdapter", "clicked..." + Integer.toString(pos));
+                    // find the tweet
+                    if (pos >= 0 && pos < tweets.size()){
+                        // start new activity
+                        Intent i = new Intent(context, TweetDetailActivity.class);
+                        // parcel
+                        i.putExtra("clickedTweet", Parcels.wrap(tweets.get(pos)));
+                        context.startActivity(i);
+                    }
+                }
+            });
         }
 
         public void bind(Tweet tweet) {
@@ -148,8 +166,8 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
 //            Log.d("TweetsAdapter", "profile img url: " + tweet.user.profileImageUrl);
             if (tweet.imgUrl != null){
                 Glide.with(context).load(tweet.imgUrl)
-                        .centerCrop()
                         .transform(new RoundedCorners(CORNER_RADIUS))
+                        .centerCrop()
                         .into(tvMedia);
 //                Log.d("TweetsAdapter", "non null imgurl: " + tweet.imgUrl);
             } else {
@@ -203,6 +221,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             });
 
         }
+
     }
 
     public void clear() {
