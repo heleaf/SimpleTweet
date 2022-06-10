@@ -34,21 +34,21 @@ import okhttp3.Headers;
 public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder>{
 
     // pass in context and list of tweets
-    TwitterClient client;
-    Context context;
-    List<Tweet> tweets;
+    TwitterClient mClient;
+    Context mContext;
+    List<Tweet> mTweets;
 
     public TweetsAdapter(Context c, List<Tweet> ts){
-        this.context = c;
-        this.tweets = ts;
-        client =  TwitterApp.getRestClient(this.context);
+        this.mContext = c;
+        this.mTweets = ts;
+        mClient =  TwitterApp.getRestClient(this.mContext);
     }
 
     // for each row inflate the layout
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_tweet, parent, false);
+        View view = LayoutInflater.from(mContext).inflate(R.layout.item_tweet, parent, false);
         return new ViewHolder(view);
     }
 
@@ -56,7 +56,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         // get data at position
-       Tweet tweet =  tweets.get(position);
+       Tweet tweet =  mTweets.get(position);
 
         // bind the tweet with the view holder
         holder.bind(tweet);
@@ -64,10 +64,10 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
 
     @Override
     public int getItemCount() {
-        return tweets.size();
+        return mTweets.size();
     }
 
-    // taken from: https://gist.github.com/nesquena/f786232f5ef72f6e10a7
+    // getRelativeTimeAgo from: https://gist.github.com/nesquena/f786232f5ef72f6e10a7
     private static final int SECOND_MILLIS = 1000;
     private static final int MINUTE_MILLIS = 60 * SECOND_MILLIS;
     private static final int HOUR_MILLIS = 60 * MINUTE_MILLIS;
@@ -77,7 +77,6 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         String twitterFormat = "EEE MMM dd HH:mm:ss ZZZZZ yyyy";
         SimpleDateFormat sf = new SimpleDateFormat(twitterFormat, Locale.ENGLISH);
         sf.setLenient(true);
-
         try {
             long time = sf.parse(rawJsonDate).getTime();
             long now = System.currentTimeMillis();
@@ -102,7 +101,6 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             Log.i("TweetsAdapter", "getRelativeTimeAgo failed");
             e.printStackTrace();
         }
-
         return "";
     }
 
@@ -110,78 +108,79 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
     public class ViewHolder extends RecyclerView.ViewHolder{
         final int MEDIA_HEIGHT = (Resources.getSystem().getDisplayMetrics().heightPixels / 4);
         final int CORNER_RADIUS = 20;
-        ImageView ivProfileImage;
-        TextView tvBody;
-        TextView tvName;
-        TextView tvScreenName;
-        ImageView tvMedia;
-        TextView relativeTimeStamp;
+        ImageView mProfileImage;
+        TextView mTweetBody;
+        TextView mName;
+        TextView mScreenName;
+        ImageView mTweetEmbMedia;
+        TextView mRelativeTimeStamp;
 
-        ImageView likeButton;
-        ImageView retweetButton;
-        ImageView replyButton;
+        ImageView mLikeButton;
+        ImageView mRetweetButton;
+        ImageView mReplyButton;
 
         public ViewHolder(@NonNull View itemView){ // one tweet
             super(itemView);
-            ivProfileImage = itemView.findViewById(R.id.detailProfileImg);
-            tvBody = itemView.findViewById(R.id.detailBody);
-            tvName = itemView.findViewById(R.id.detailName);
-            tvScreenName = itemView.findViewById(R.id.detailUserName);
-            tvMedia = itemView.findViewById(R.id.detailEmbImg);
-            ViewGroup.LayoutParams tvMediaParams = tvMedia.getLayoutParams();
+            mProfileImage = itemView.findViewById(R.id.detailProfileImg);
+            mTweetBody = itemView.findViewById(R.id.detailBody);
+            mName = itemView.findViewById(R.id.detailName);
+            mScreenName = itemView.findViewById(R.id.detailUserName);
+            mTweetEmbMedia = itemView.findViewById(R.id.detailEmbImg);
+            ViewGroup.LayoutParams tvMediaParams = mTweetEmbMedia.getLayoutParams();
             tvMediaParams.height = MEDIA_HEIGHT;
-            tvMedia.setLayoutParams(tvMediaParams);
-            relativeTimeStamp = itemView.findViewById(R.id.detailTimeStamp);
+            mTweetEmbMedia.setLayoutParams(tvMediaParams);
+            mRelativeTimeStamp = itemView.findViewById(R.id.detailTimeStamp);
 
-            likeButton = itemView.findViewById(R.id.detailLikeButton);
-            retweetButton = itemView.findViewById(R.id.detailRetweetButton);
-            replyButton = itemView.findViewById(R.id.detailReplyButton);
+            mLikeButton = itemView.findViewById(R.id.detailLikeButton);
+            mRetweetButton = itemView.findViewById(R.id.detailRetweetButton);
+            mReplyButton = itemView.findViewById(R.id.detailReplyButton);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     int pos = getAdapterPosition();
-                    Log.d("TweetsAdapter", "clicked..." + Integer.toString(pos));
+//                    Log.d("TweetsAdapter", "clicked..." + Integer.toString(pos));
                     // find the tweet
-                    if (pos >= 0 && pos < tweets.size()){
+                    if (pos >= 0 && pos < mTweets.size()){
                         // start new activity
-                        Intent i = new Intent(context, TweetDetailActivity.class);
-                        // parcel
-                        i.putExtra("clickedTweet", Parcels.wrap(tweets.get(pos)));
-                        context.startActivity(i);
+                        Intent i = new Intent(mContext, TweetDetailActivity.class);
+                        i.putExtra("clickedTweet", Parcels.wrap(mTweets.get(pos)));
+                        mContext.startActivity(i);
                     }
                 }
             });
         }
 
         public void bind(Tweet tweet) {
-            tvBody.setText(tweet.body);
-            tvName.setText(tweet.user.name);
-            tvScreenName.setText(String.format("@%s", tweet.user.screenName));
+            mTweetBody.setText(tweet.mBody);
+            mName.setText(tweet.mUser.mName);
+            mScreenName.setText(String.format("@%s", tweet.mUser.mScreenName));
 
-            relativeTimeStamp.setText(getRelativeTimeAgo(tweet.createdAt));
-            Glide.with(context).load(tweet.user.profileImageUrl)
+            mRelativeTimeStamp.setText(getRelativeTimeAgo(tweet.mCreatedAt));
+            Glide.with(mContext).load(tweet.mUser.mProfileImageUrl)
                     .transform(new RoundedCorners(CORNER_RADIUS))
-                    .into(ivProfileImage);
+                    .into(mProfileImage);
 //            Log.d("TweetsAdapter", "profile img url: " + tweet.user.profileImageUrl);
-            if (tweet.imgUrl != null){
-                Glide.with(context).load(tweet.imgUrl)
+            if (tweet.mEmbedImgUrl != null){
+                Glide.with(mContext).load(tweet.mEmbedImgUrl)
                         .transform(new RoundedCorners(CORNER_RADIUS))
                         .centerCrop()
-                        .into(tvMedia);
+                        .into(mTweetEmbMedia);
 //                Log.d("TweetsAdapter", "non null imgurl: " + tweet.imgUrl);
             } else {
-                tvMedia.setVisibility(android.view.View.GONE);
+                mTweetEmbMedia.setVisibility(android.view.View.GONE);
             }
 
-            likeButton.setOnClickListener(new View.OnClickListener() {
+            // TODO: define handlers separately since they are reused in TweetDetailActivity
+            // maybe try to curry arguments?
+            mLikeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    client.likeTweet(tweet.id, !tweet.favorited, new JsonHttpResponseHandler() {
+                    mClient.likeTweet(tweet.mId, !tweet.mFavorited, new JsonHttpResponseHandler() {
                         @Override
                         public void onSuccess(int statusCode, Headers headers, JSON json) {
-                            tweet.favorited = !tweet.favorited;
-                            likeButton.setImageResource(tweet.favorited ?
+                            tweet.mFavorited = !tweet.mFavorited;
+                            mLikeButton.setImageResource(tweet.mFavorited ?
                                     R.drawable.ic_vector_heart :
                                     R.drawable.ic_vector_heart_stroke);
                             Log.d("TweetsAdapter", "liked the tweet?");
@@ -191,23 +190,23 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                         public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
                             Log.e("TweetsAdapter",
                                     String.format("failed to %s tweet: %s",
-                                            tweet.favorited ? "unlike" : "like", response),
+                                            tweet.mFavorited ? "unlike" : "like", response),
                                     throwable);
                         }
                     });
                 }
             });
 
-            retweetButton.setOnClickListener(new View.OnClickListener() {
+            mRetweetButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    client.retweet(tweet.id, new JsonHttpResponseHandler() {
+                    mClient.retweet(tweet.mId, new JsonHttpResponseHandler() {
                         @Override
                         public void onSuccess(int statusCode, Headers headers, JSON json) {
                             Log.d("TweetsAdapter", "successfully retweeted");
                             // notify data set changed?
                             notifyItemInserted(0);
-                            retweetButton.setImageResource(R.drawable.ic_vector_retweet);
+                            mRetweetButton.setImageResource(R.drawable.ic_vector_retweet);
                         }
                         @Override
                         public void onFailure(int statusCode, Headers headers,
@@ -225,12 +224,12 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
     }
 
     public void clear() {
-        tweets.clear();
+        mTweets.clear();
         this.notifyDataSetChanged();
     }
 
     public void addAll(List<Tweet> list){
-        tweets.addAll(list);
+        mTweets.addAll(list);
         this.notifyDataSetChanged();
     }
 }

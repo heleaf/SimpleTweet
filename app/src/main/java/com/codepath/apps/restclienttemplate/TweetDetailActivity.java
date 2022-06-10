@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
-import com.codepath.apps.restclienttemplate.adapters.TweetsAdapter;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 
@@ -21,70 +20,73 @@ import okhttp3.Headers;
 
 public class TweetDetailActivity extends AppCompatActivity {
     final int CORNER_RADIUS = 20;
-    ImageView detailProfileImage;
-    TextView detailBody;
-    TextView detailName;
-    TextView detailScreenName;
-    ImageView detailMedia;
-    TextView detailTimeStamp;
 
-    ImageView detailLikeButton;
-    ImageView detailRetweetButton;
-    ImageView detailReplyButton;
+    ImageView mDetailProfileImage;
+    TextView mDetailBody;
+    TextView mDetailName;
+    TextView mDetailScreenName;
+    ImageView mDetailMedia;
+    TextView mDetailTimeStamp;
 
-    Context context;
-    TwitterClient client;
+    ImageView mDetailLikeButton;
+    ImageView mDetailRetweetButton;
+    ImageView mDetailReplyButton;
+
+    Context mContext;
+    TwitterClient mClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tweet_detail);
 
-        detailName = findViewById(R.id.detailName);
-        detailScreenName = findViewById(R.id.detailUserName);
-        detailBody = findViewById(R.id.detailBody);
-        detailTimeStamp = findViewById(R.id.detailTimeStamp);
+        mDetailName = findViewById(R.id.detailName);
+        mDetailScreenName = findViewById(R.id.detailUserName);
+        mDetailBody = findViewById(R.id.detailBody);
+        mDetailTimeStamp = findViewById(R.id.detailTimeStamp);
 
-        detailProfileImage = findViewById(R.id.detailProfileImg);
-        detailMedia = findViewById(R.id.detailEmbImg);
+        mDetailProfileImage = findViewById(R.id.detailProfileImg);
+        mDetailMedia = findViewById(R.id.detailEmbImg);
 
-        detailLikeButton = findViewById(R.id.detailLikeButton);
-        detailRetweetButton = findViewById(R.id.detailRetweetButton);
-        detailReplyButton = findViewById(R.id.detailReplyButton);
+        mDetailLikeButton = findViewById(R.id.detailLikeButton);
+        mDetailRetweetButton = findViewById(R.id.detailRetweetButton);
+        mDetailReplyButton = findViewById(R.id.detailReplyButton);
 
-        context = this;
-        client = TwitterApp.getRestClient(this.context);
+        mContext = this;
+        mClient = TwitterApp.getRestClient(this.mContext);
 
         Tweet tweet = Parcels.unwrap(getIntent().getParcelableExtra("clickedTweet"));
         // validate tweet object?
 
-        detailName.setText(tweet.user.name);
-        detailScreenName.setText(String.format("@%s",tweet.user.screenName));
-        detailBody.setText(tweet.body);
-        detailTimeStamp.setText(tweet.createdAt);
+        mDetailName.setText(tweet.mUser.mName);
+        mDetailScreenName.setText(String.format("@%s",tweet.mUser.mScreenName));
+        mDetailBody.setText(tweet.mBody);
+        mDetailTimeStamp.setText(tweet.mCreatedAt);
 
-        Glide.with(context).load(tweet.user.profileImageUrl)
+        Glide.with(mContext).load(tweet.mUser.mProfileImageUrl)
                 .transform(new RoundedCorners(CORNER_RADIUS))
-                .into(detailProfileImage);
+                .into(mDetailProfileImage);
 //            Log.d("TweetsAdapter", "profile img url: " + tweet.user.profileImageUrl);
-        if (tweet.imgUrl != null){
-            Glide.with(context).load(tweet.imgUrl)
+        if (tweet.mEmbedImgUrl != null){
+            Glide.with(mContext).load(tweet.mEmbedImgUrl)
                     .transform(new RoundedCorners(CORNER_RADIUS))
-//                    .centerCrop()
-                    .into(detailMedia);
+                    .fitCenter()
+                    .into(mDetailMedia);
 //                Log.d("TweetsAdapter", "non null imgurl: " + tweet.imgUrl);
         } else {
-            detailMedia.setVisibility(android.view.View.GONE);
+            mDetailMedia.setVisibility(android.view.View.GONE);
         }
 
-        detailLikeButton.setOnClickListener(new View.OnClickListener() {
+        mDetailLikeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                client.likeTweet(tweet.id, !tweet.favorited, new JsonHttpResponseHandler() {
+                mClient.likeTweet(tweet.mId, !tweet.mFavorited, new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Headers headers, JSON json) {
-                        tweet.favorited = !tweet.favorited;
-                        detailLikeButton.setImageResource(tweet.favorited ?
+                        tweet.mFavorited = !tweet.mFavorited;
+
+                        // TODO: use selectors in XML instead, and add color styling
+                        mDetailLikeButton.setImageResource(tweet.mFavorited ?
                                 R.drawable.ic_vector_heart :
                                 R.drawable.ic_vector_heart_stroke);
                         Log.d("TweetsAdapter", "liked the tweet?");
@@ -94,35 +96,32 @@ public class TweetDetailActivity extends AppCompatActivity {
                     public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
                         Log.e("TweetsAdapter",
                                 String.format("failed to %s tweet: %s",
-                                        tweet.favorited ? "unlike" : "like", response),
+                                        tweet.mFavorited ? "unlike" : "like", response),
                                 throwable);
                     }
                 });
             }
         });
 
-        detailRetweetButton.setOnClickListener(new View.OnClickListener() {
+        mDetailRetweetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                client.retweet(tweet.id, new JsonHttpResponseHandler() {
+                mClient.retweet(tweet.mId, new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Headers headers, JSON json) {
                         Log.d("TweetsAdapter", "successfully retweeted");
-                        // notify data set changed?
-//                        notifyItemInserted(0);
-                        detailRetweetButton.setImageResource(R.drawable.ic_vector_retweet);
+                        // TODO: use selectors in XML instead, and add color styling
+                        mDetailRetweetButton.setImageResource(R.drawable.ic_vector_retweet);
                     }
                     @Override
                     public void onFailure(int statusCode, Headers headers,
                                           String response, Throwable throwable) {
                         Log.e("TweetsAdapter", "failed to retweet: " + response,
                                 throwable);
-
                     }
                 });
             }
         });
 
     }
-
 }

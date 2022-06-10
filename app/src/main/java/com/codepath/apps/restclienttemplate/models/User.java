@@ -7,17 +7,17 @@ import org.parceler.Parcel;
 @Parcel
 public class User {
 
-    public String name;
-    public String screenName; // handle
-    public String profileImageUrl;
+    public String mName;
+    public String mScreenName; // handle
+    public String mProfileImageUrl;
 
     public User(){} // empty constructor needed by parceler library
 
     public static User fromJson(JSONObject jsonObject) throws JSONException {
         User user = new User();
-        user.name = jsonObject.getString("name");
-        user.screenName = jsonObject.getString("screen_name");
-        user.profileImageUrl = jsonObject.getString("profile_image_url_https");
+        user.mName = jsonObject.getString("name");
+        user.mScreenName = jsonObject.getString("screen_name");
+        user.mProfileImageUrl = jsonObject.getString("profile_image_url_https");
         return user;
     }
 }

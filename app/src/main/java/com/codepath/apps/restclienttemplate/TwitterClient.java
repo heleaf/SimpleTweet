@@ -64,7 +64,6 @@ public class TwitterClient extends OAuthBaseClient {
 	 *    i.e client.post(apiUrl, params, handler);
 	 */
 
-
 	public void publishTweet(String tweetContent, JsonHttpResponseHandler handler){
 		String apiUrl = getApiUrl("statuses/update.json");
 
@@ -73,7 +72,7 @@ public class TwitterClient extends OAuthBaseClient {
 		client.post(apiUrl, params, "", handler);
 	}
 
-	// likeTweet
+	// like or unlike tweet depending on setToLiked arg
 	public void likeTweet(String tweetId, boolean setToLiked, JsonHttpResponseHandler handler){
 		String apiUrl = setToLiked ? getApiUrl("favorites/create.json")
 				: getApiUrl("favorites/destroy.json");
@@ -84,12 +83,11 @@ public class TwitterClient extends OAuthBaseClient {
 
 	// retweet
 	public void retweet(String tweetId, JsonHttpResponseHandler handler){
-		// statuses/retweet/:id.json
 		String apiUrl = getApiUrl(String.format("statuses/retweet/%s.json", tweetId));
 		RequestParams params = new RequestParams();
 		params.put("id", tweetId);
 		client.post(apiUrl, params, "", handler);
 	}
 
-	// replyTweet
+	// TODO: replyTweet
 }
