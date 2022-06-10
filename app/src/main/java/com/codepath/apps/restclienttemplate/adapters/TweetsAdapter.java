@@ -1,8 +1,8 @@
 package com.codepath.apps.restclienttemplate.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,29 +16,41 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.codepath.apps.restclienttemplate.R;
+import com.codepath.apps.restclienttemplate.TweetDetailActivity;
+import com.codepath.apps.restclienttemplate.TwitterApp;
+import com.codepath.apps.restclienttemplate.TwitterClient;
 import com.codepath.apps.restclienttemplate.models.Tweet;
+import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
+
+import org.parceler.Parcels;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
-public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder> {
+import okhttp3.Headers;
+
+public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder>{
 
     // pass in context and list of tweets
-    Context context;
-    List<Tweet> tweets;
+    TwitterClient mClient;
+    Context mContext;
+    List<Tweet> mTweets;
+    TweetsAdapter adapter;
 
     public TweetsAdapter(Context c, List<Tweet> ts){
-        this.context = c;
-        this.tweets = ts;
+        this.mContext = c;
+        this.mTweets = ts;
+        mClient =  TwitterApp.getRestClient(this.mContext);
+        adapter = this;
     }
 
     // for each row inflate the layout
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_tweet, parent, false);
+        View view = LayoutInflater.from(mContext).inflate(R.layout.item_tweet, parent, false);
         return new ViewHolder(view);
     }
 
@@ -46,7 +58,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         // get data at position
-       Tweet tweet =  tweets.get(position);
+       Tweet tweet =  mTweets.get(position);
 
         // bind the tweet with the view holder
         holder.bind(tweet);
@@ -54,10 +66,10 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
 
     @Override
     public int getItemCount() {
-        return tweets.size();
+        return mTweets.size();
     }
 
-    // taken from: https://gist.github.com/nesquena/f786232f5ef72f6e10a7
+    // getRelativeTimeAgo from: https://gist.github.com/nesquena/f786232f5ef72f6e10a7
     private static final int SECOND_MILLIS = 1000;
     private static final int MINUTE_MILLIS = 60 * SECOND_MILLIS;
     private static final int HOUR_MILLIS = 60 * MINUTE_MILLIS;
@@ -67,7 +79,6 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         String twitterFormat = "EEE MMM dd HH:mm:ss ZZZZZ yyyy";
         SimpleDateFormat sf = new SimpleDateFormat(twitterFormat, Locale.ENGLISH);
         sf.setLenient(true);
-
         try {
             long time = sf.parse(rawJsonDate).getTime();
             long now = System.currentTimeMillis();
@@ -92,58 +103,117 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             Log.i("TweetsAdapter", "getRelativeTimeAgo failed");
             e.printStackTrace();
         }
-
         return "";
     }
 
-    // define a viewholder
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder{
         final int MEDIA_HEIGHT = (Resources.getSystem().getDisplayMetrics().heightPixels / 4);
         final int CORNER_RADIUS = 20;
-        ImageView ivProfileImage;
-        TextView tvBody;
-        TextView tvScreenName;
-        ImageView tvMedia;
-        TextView relativeTimeStamp;
+        ImageView mProfileImage;
+        TextView mTweetBody;
+        TextView mName;
+        TextView mScreenName;
+        ImageView mTweetEmbMedia;
+        TextView mRelativeTimeStamp;
+
+        ImageView mLikeButton;
+        ImageView mRetweetButton;
+        ImageView mReplyButton;
+
         public ViewHolder(@NonNull View itemView){ // one tweet
             super(itemView);
-            ivProfileImage = itemView.findViewById(R.id.ivProfileImage);
-            tvBody = itemView.findViewById(R.id.tvBody);
-            tvScreenName = itemView.findViewById(R.id.tvScreenName);
-            tvMedia = itemView.findViewById(R.id.tvEmbedImg);
-            ViewGroup.LayoutParams tvMediaParams = tvMedia.getLayoutParams();
+            mProfileImage = itemView.findViewById(R.id.detailProfileImg);
+            mTweetBody = itemView.findViewById(R.id.detailBody);
+            mName = itemView.findViewById(R.id.detailName);
+            mScreenName = itemView.findViewById(R.id.detailUserName);
+            mTweetEmbMedia = itemView.findViewById(R.id.detailEmbImg);
+            ViewGroup.LayoutParams tvMediaParams = mTweetEmbMedia.getLayoutParams();
             tvMediaParams.height = MEDIA_HEIGHT;
-            tvMedia.setLayoutParams(tvMediaParams);
-            relativeTimeStamp = itemView.findViewById(R.id.relativeTimeStamp);
+            mTweetEmbMedia.setLayoutParams(tvMediaParams);
+            mRelativeTimeStamp = itemView.findViewById(R.id.detailTimeStamp);
+
+            mLikeButton = itemView.findViewById(R.id.detailLikeButton);
+            mRetweetButton = itemView.findViewById(R.id.detailRetweetButton);
+            mReplyButton = itemView.findViewById(R.id.detailReplyButton);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int pos = getAdapterPosition();
+                    // find the tweet
+                    if (pos >= 0 && pos < mTweets.size()){
+                        // start new activity
+                        Intent i = new Intent(mContext, TweetDetailActivity.class);
+                        i.putExtra("clickedTweet", Parcels.wrap(mTweets.get(pos)));
+                        mContext.startActivity(i);
+                    }
+                }
+            });
         }
 
         public void bind(Tweet tweet) {
-            tvBody.setText(tweet.body);
-            tvScreenName.setText(tweet.user.screenName);
-            relativeTimeStamp.setText(getRelativeTimeAgo(tweet.createdAt));
-            Glide.with(context).load(tweet.user.profileImageUrl)
+            mTweetBody.setText(tweet.mBody);
+            mName.setText(tweet.mUser.mName);
+            mScreenName.setText(String.format("@%s", tweet.mUser.mScreenName));
+
+            mRelativeTimeStamp.setText(getRelativeTimeAgo(tweet.mCreatedAt));
+            Glide.with(mContext).load(tweet.mUser.mProfileImageUrl)
                     .transform(new RoundedCorners(CORNER_RADIUS))
-                    .into(ivProfileImage);
-            Log.d("TweetsAdapter", "profile img url: " + tweet.user.profileImageUrl);
-            if (tweet.imgUrl != null){
-                Glide.with(context).load(tweet.imgUrl)
-                        .centerCrop()
+                    .into(mProfileImage);
+//            Log.d("TweetsAdapter", "profile img url: " + tweet.user.profileImageUrl);
+            if (tweet.mEmbedImgUrl != null){
+                Glide.with(mContext).load(tweet.mEmbedImgUrl)
                         .transform(new RoundedCorners(CORNER_RADIUS))
-                        .into(tvMedia);
-                Log.d("TweetsAdapter", "non null imgurl: " + tweet.imgUrl);
+                        .centerCrop()
+                        .into(mTweetEmbMedia);
+//                Log.d("TweetsAdapter", "non null imgurl: " + tweet.imgUrl);
             } else {
-                tvMedia.setVisibility(android.view.View.GONE);
+                mTweetEmbMedia.setVisibility(android.view.View.GONE);
             }
+
+            // TODO: define handlers separately since they are reused in TweetDetailActivity
+            // maybe try to curry arguments?
+            mLikeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mClient.likeTweet(tweet.mId, !tweet.mFavorited,
+                            mClient.getLikeTweetHandler(tweet, mLikeButton));
+                }
+            });
+
+            mRetweetButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mClient.retweet(tweet.mId, mClient.getRetweetHandler(mRetweetButton, adapter));
+                }
+            });
+
+            mReplyButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d("TweetsAdapter", "mReplyButton clicked");
+
+                    // start an intent to start a detailActivity
+                    // in the detailActivity make the editTextBox visible...
+                    // add text to the editTextBox....
+                    Intent i = new Intent(mContext, TweetDetailActivity.class);
+                    i.putExtra("clickedTweet", Parcels.wrap(tweet));
+                    i.putExtra("isReplying", true);
+                    mContext.startActivity(i);
+                }
+            });
+
         }
+
     }
 
     public void clear() {
-        tweets.clear();
+        mTweets.clear();
         this.notifyDataSetChanged();
     }
 
     public void addAll(List<Tweet> list){
-        tweets.addAll(list);
+        mTweets.addAll(list);
         this.notifyDataSetChanged();
     }
 }

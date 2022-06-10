@@ -25,64 +25,53 @@ public class ComposeActivity extends AppCompatActivity {
     public static final int MAX_TWEET_LENGTH = 140;
     public static final String TAG = "ComposeActivity";
 
-    EditText etCompose;
-    Button buttonTweet;
+    EditText mEtCompose;
+    Button mButtonTweet;
 
-    TwitterClient client;
+    TwitterClient mClient;
+
+    ComposeActivity activity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_compose);
 
-        etCompose = findViewById(R.id.etCompose);
-        buttonTweet = findViewById(R.id.buttonTweet);
+        mEtCompose = findViewById(R.id.etCompose);
+        mButtonTweet = findViewById(R.id.buttonTweet);
 
-        client = TwitterApp.getRestClient(this);
+        mClient = TwitterApp.getRestClient(this);
+
+        activity = this;
 
         // add a click listener to the button
-        buttonTweet.setOnClickListener(new View.OnClickListener() {
+        mButtonTweet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // tweet is empty or too long --> let user try again
-                String tweetContent = etCompose.getText().toString();
-                if (tweetContent.isEmpty()){
-                    Toast.makeText(ComposeActivity.this, "Sorry, your tweet cannot be empty", Toast.LENGTH_LONG).show();
-                    return;
-                } if (tweetContent.length() > MAX_TWEET_LENGTH){
-                    Toast.makeText(ComposeActivity.this, "Sorry, your tweet is too long", Toast.LENGTH_LONG).show();
-                    return;
-                }
+                String tweetContent = mEtCompose.getText().toString();
+                if (!isTweetValid(tweetContent, activity)) return;
                 // make API call to twitter to publish the tweet
 
 //                Toast.makeText(ComposeActivity.this, tweetContent, Toast.LENGTH_LONG).show();
-                client.publishTweet(tweetContent, new JsonHttpResponseHandler() {
-                    @Override
-                    public void onSuccess(int statusCode, Headers headers, JSON json) {
-                        Log.i(TAG, "onSuccess to publish tweet");
-                        // expect a tweet model for the json
-                        try {
-                            Tweet tweet = Tweet.fromJson(json.jsonObject);
-                            Log.i(TAG, "Published tweet says: " + tweet.body);
-                            Intent intent = new Intent();
-                            intent.putExtra("tweet", Parcels.wrap(tweet));
-                            setResult(RESULT_OK, intent);
-                            finish(); // close activity and return to the parent
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-                    }
-
-                    @Override
-                    public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
-                        Log.e(TAG, "onFailure to publish tweet", throwable);
-                    }
-                });
-
-
-
+                mClient.publishTweet(tweetContent, null,
+                        TwitterClient.getPublishTweetHandler(activity));
             }
         });
+    }
+
+    public static boolean isTweetValid(String tweetContent, AppCompatActivity activity){
+        if (tweetContent.isEmpty()){
+            Toast.makeText(activity,
+                    "Sorry, your tweet cannot be empty",
+                    Toast.LENGTH_LONG).show();
+            return false;
+        } if (tweetContent.length() > MAX_TWEET_LENGTH){
+            Toast.makeText(activity,
+                    "Sorry, your tweet is too long",
+                    Toast.LENGTH_LONG).show();
+            return false;
+        }
+        return true;
     }
 }

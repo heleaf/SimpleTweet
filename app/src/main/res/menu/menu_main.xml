@@ -3,8 +3,13 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/logOutFromMenu"
+        android:icon="?attr/actionModeCloseDrawable"
+        android:title="Log Out"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/compose"
-        android:icon="@android:drawable/ic_menu_edit"
+        android:icon="@drawable/vector_compose_fab"
         android:title="New Tweet"
         app:showAsAction="always" />
 </menu>
