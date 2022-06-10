@@ -49,6 +49,7 @@ Here's a walkthrough of implemented user stories:
 
 ## Notes
 - It was a challenging trying to add modularity to the code (a lot of reused callback functions between different buttons and imageviews) 
+- Some of the different ways to interact with intents were confusing (startIntentForActivity, onActivityResult) 
 
 ## Open-source libraries used
 
