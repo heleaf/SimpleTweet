@@ -3,6 +3,9 @@ package com.codepath.apps.restclienttemplate;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.codepath.asynchttpclient.RequestParams;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 import com.codepath.oauth.OAuthBaseClient;
@@ -64,11 +67,18 @@ public class TwitterClient extends OAuthBaseClient {
 	 *    i.e client.post(apiUrl, params, handler);
 	 */
 
-	public void publishTweet(String tweetContent, JsonHttpResponseHandler handler){
+	// write a new tweet or respond to someone else
+	public void publishTweet(String tweetContent, String idInReplyTo, JsonHttpResponseHandler handler){
 		String apiUrl = getApiUrl("statuses/update.json");
-
 		RequestParams params = new RequestParams();
+		// must pass in non-null id and user to be considered a reply
+		if (idInReplyTo == null){
+			params.put("status", tweetContent);
+			client.post(apiUrl, params, "", handler);
+		}
+		// add the in_reply_to_status_id otherwise
 		params.put("status", tweetContent);
+		params.put("in_reply_to_status_id", idInReplyTo);
 		client.post(apiUrl, params, "", handler);
 	}
 
@@ -89,5 +99,4 @@ public class TwitterClient extends OAuthBaseClient {
 		client.post(apiUrl, params, "", handler);
 	}
 
-	// TODO: replyTweet
 }

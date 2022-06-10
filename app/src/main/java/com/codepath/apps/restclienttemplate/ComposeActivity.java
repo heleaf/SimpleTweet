@@ -24,6 +24,7 @@ public class ComposeActivity extends AppCompatActivity {
 
     public static final int MAX_TWEET_LENGTH = 140;
     public static final String TAG = "ComposeActivity";
+//    public static final int NOT_REPLYING = -1;
 
     EditText mEtCompose;
     Button mButtonTweet;
@@ -60,7 +61,7 @@ public class ComposeActivity extends AppCompatActivity {
                 // make API call to twitter to publish the tweet
 
 //                Toast.makeText(ComposeActivity.this, tweetContent, Toast.LENGTH_LONG).show();
-                mClient.publishTweet(tweetContent, new JsonHttpResponseHandler() {
+                mClient.publishTweet(tweetContent, null, new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Headers headers, JSON json) {
                         Log.i(TAG, "onSuccess to publish tweet");

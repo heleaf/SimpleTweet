@@ -219,6 +219,21 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                 }
             });
 
+            mReplyButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d("TweetsAdapter", "mReplyButton clicked");
+
+                    // start an intent to start a detailActivity
+                    // in the detailActivity make the editTextBox visible...
+                    // add text to the editTextBox....
+                    Intent i = new Intent(mContext, TweetDetailActivity.class);
+                    i.putExtra("clickedTweet", Parcels.wrap(tweet));
+                    i.putExtra("isReplying", true);
+                    mContext.startActivity(i);
+                }
+            });
+
         }
 
     }
