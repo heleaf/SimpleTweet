@@ -50,6 +50,7 @@ Here's a walkthrough of implemented user stories:
 ## Notes
 - It was a challenging trying to add modularity to the code (a lot of reused callback functions between different buttons and imageviews) 
 - Some of the different ways to interact with intents were confusing (startIntentForActivity, onActivityResult) 
+- It was difficult to make layouts consistent (for me, some of the text fields still overlap with each other / appear in strange places, even with constraints) 
 
 ## Open-source libraries used
 
