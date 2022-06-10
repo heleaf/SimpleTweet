@@ -48,10 +48,14 @@ public class TweetDetailActivity extends AppCompatActivity {
     Button mPublishTweetResponse;
     Boolean mIsReplying;
 
+    TweetDetailActivity activity;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tweet_detail);
+
+        activity = this;
 
         mDetailName = findViewById(R.id.detailName);
         mDetailScreenName = findViewById(R.id.detailUserName);
@@ -79,13 +83,11 @@ public class TweetDetailActivity extends AppCompatActivity {
         Glide.with(mContext).load(tweet.mUser.mProfileImageUrl)
                 .transform(new RoundedCorners(CORNER_RADIUS))
                 .into(mDetailProfileImage);
-//            Log.d("TweetsAdapter", "profile img url: " + tweet.user.profileImageUrl);
         if (tweet.mEmbedImgUrl != null){
             Glide.with(mContext).load(tweet.mEmbedImgUrl)
                     .transform(new RoundedCorners(CORNER_RADIUS))
                     .fitCenter()
                     .into(mDetailMedia);
-//                Log.d("TweetsAdapter", "non null imgurl: " + tweet.imgUrl);
         } else {
             mDetailMedia.setVisibility(android.view.View.GONE);
         }
@@ -93,49 +95,18 @@ public class TweetDetailActivity extends AppCompatActivity {
         mDetailLikeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mClient.likeTweet(tweet.mId, !tweet.mFavorited, new JsonHttpResponseHandler() {
-                    @Override
-                    public void onSuccess(int statusCode, Headers headers, JSON json) {
-                        tweet.mFavorited = !tweet.mFavorited;
-
-                        // TODO: use selectors in XML instead, and add color styling
-                        mDetailLikeButton.setImageResource(tweet.mFavorited ?
-                                R.drawable.ic_vector_heart :
-                                R.drawable.ic_vector_heart_stroke);
-                        Log.d("TweetsAdapter", "liked the tweet?");
-                    }
-
-                    @Override
-                    public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
-                        Log.e("TweetsAdapter",
-                                String.format("failed to %s tweet: %s",
-                                        tweet.mFavorited ? "unlike" : "like", response),
-                                throwable);
-                    }
-                });
+                mClient.likeTweet(tweet.mId, !tweet.mFavorited,
+                        mClient.getLikeTweetHandler(tweet, mDetailLikeButton));
             }
         });
 
         mDetailRetweetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mClient.retweet(tweet.mId, new JsonHttpResponseHandler() {
-                    @Override
-                    public void onSuccess(int statusCode, Headers headers, JSON json) {
-                        Log.d("TweetsAdapter", "successfully retweeted");
-                        // TODO: use selectors in XML instead, and add color styling
-                        mDetailRetweetButton.setImageResource(R.drawable.ic_vector_retweet);
-                    }
-                    @Override
-                    public void onFailure(int statusCode, Headers headers,
-                                          String response, Throwable throwable) {
-                        Log.e("TweetsAdapter", "failed to retweet: " + response,
-                                throwable);
-                    }
-                });
+                mClient.retweet(tweet.mId,
+                        mClient.getRetweetHandler(mDetailRetweetButton, null));
             }
         });
-
 
         // replying functionality
         mEtReplyCompose = findViewById(R.id.etReplyTweet);
@@ -168,46 +139,14 @@ public class TweetDetailActivity extends AppCompatActivity {
         mPublishTweetResponse.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                // need to do the checks...
+                String tweetContent = mEtReplyCompose.getText().toString();
 
                 // tweet is empty or too long --> let user try again
-                String tweetContent = mEtReplyCompose.getText().toString();
-                if (tweetContent.isEmpty()){
-                    Toast.makeText(TweetDetailActivity.this,
-                            "Sorry, your tweet cannot be empty",
-                            Toast.LENGTH_LONG).show();
-                    return;
-                } if (tweetContent.length() > MAX_TWEET_LENGTH){
-                    Toast.makeText(TweetDetailActivity.this,
-                            "Sorry, your tweet is too long",
-                            Toast.LENGTH_LONG).show();
-                    return;
-                }
+                if (!ComposeActivity.isTweetValid(tweetContent, activity)) return;
+
                 // make API call to twitter to publish the tweet
-
-//                Toast.makeText(ComposeActivity.this, tweetContent, Toast.LENGTH_LONG).show();
-                mClient.publishTweet(tweetContent, tweet.mId, new JsonHttpResponseHandler() {
-                        @Override
-                        public void onSuccess(int statusCode, Headers headers, JSON json) {
-                            Log.i(TAG, "onSuccess to publish tweet");
-                            // expect a tweet model for the json
-                            try {
-                                Tweet tweet = Tweet.fromJson(json.jsonObject);
-                                Log.i(TAG, "Published tweet says: " + tweet.mBody);
-                                Intent intent = new Intent();
-                                intent.putExtra("tweet", Parcels.wrap(tweet));
-                                setResult(RESULT_OK, intent);
-                                finish(); // close activity and return to the parent
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
-                            Log.e(TAG, "onFailure to publish tweet", throwable);
-                        }
-                    });
+                mClient.publishTweet(tweetContent, tweet.mId,
+                        TwitterClient.getPublishTweetHandler(activity));
             }
         });
 

@@ -37,11 +37,13 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
     TwitterClient mClient;
     Context mContext;
     List<Tweet> mTweets;
+    TweetsAdapter adapter;
 
     public TweetsAdapter(Context c, List<Tweet> ts){
         this.mContext = c;
         this.mTweets = ts;
         mClient =  TwitterApp.getRestClient(this.mContext);
+        adapter = this;
     }
 
     // for each row inflate the layout
@@ -104,7 +106,6 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         return "";
     }
 
-
     public class ViewHolder extends RecyclerView.ViewHolder{
         final int MEDIA_HEIGHT = (Resources.getSystem().getDisplayMetrics().heightPixels / 4);
         final int CORNER_RADIUS = 20;
@@ -139,7 +140,6 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                 @Override
                 public void onClick(View v) {
                     int pos = getAdapterPosition();
-//                    Log.d("TweetsAdapter", "clicked..." + Integer.toString(pos));
                     // find the tweet
                     if (pos >= 0 && pos < mTweets.size()){
                         // start new activity
@@ -176,46 +176,15 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             mLikeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mClient.likeTweet(tweet.mId, !tweet.mFavorited, new JsonHttpResponseHandler() {
-                        @Override
-                        public void onSuccess(int statusCode, Headers headers, JSON json) {
-                            tweet.mFavorited = !tweet.mFavorited;
-                            mLikeButton.setImageResource(tweet.mFavorited ?
-                                    R.drawable.ic_vector_heart :
-                                    R.drawable.ic_vector_heart_stroke);
-                            Log.d("TweetsAdapter", "liked the tweet?");
-                        }
-
-                        @Override
-                        public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
-                            Log.e("TweetsAdapter",
-                                    String.format("failed to %s tweet: %s",
-                                            tweet.mFavorited ? "unlike" : "like", response),
-                                    throwable);
-                        }
-                    });
+                    mClient.likeTweet(tweet.mId, !tweet.mFavorited,
+                            mClient.getLikeTweetHandler(tweet, mLikeButton));
                 }
             });
 
             mRetweetButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mClient.retweet(tweet.mId, new JsonHttpResponseHandler() {
-                        @Override
-                        public void onSuccess(int statusCode, Headers headers, JSON json) {
-                            Log.d("TweetsAdapter", "successfully retweeted");
-                            // notify data set changed?
-                            notifyItemInserted(0);
-                            mRetweetButton.setImageResource(R.drawable.ic_vector_retweet);
-                        }
-                        @Override
-                        public void onFailure(int statusCode, Headers headers,
-                                              String response, Throwable throwable) {
-                            Log.e("TweetsAdapter", "failed to retweet: " + response,
-                                    throwable);
-
-                        }
-                    });
+                    mClient.retweet(tweet.mId, mClient.getRetweetHandler(mRetweetButton, adapter));
                 }
             });
 

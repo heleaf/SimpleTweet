@@ -56,9 +56,6 @@ public class TimelineActivity extends AppCompatActivity {
         mTweets = new ArrayList<>();
         mAdapter = new TweetsAdapter(this, mTweets);
 
-//        rvTweets.setLayoutManager(new LinearLayoutManager(this));
-//        rvTweets.setAdapter(adapter);
-//        populateHomeTimeline();
     }
 
     @Override
@@ -67,7 +64,6 @@ public class TimelineActivity extends AppCompatActivity {
         super.onStart();
 
         // populate variables
-
         mSwipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
