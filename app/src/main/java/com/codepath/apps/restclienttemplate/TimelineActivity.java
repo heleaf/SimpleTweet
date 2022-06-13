@@ -109,6 +109,13 @@ public class TimelineActivity extends AppCompatActivity {
     protected void onDestroy() {
         Log.d("TimelineActivity", "destroying");
         super.onDestroy();
+
+        mSwipeContainer = null;
+        mClient = null;
+        mRvTweets = null;
+        mTweets = null;
+        mAdapter = null;
+
     }
 
 
@@ -117,6 +124,7 @@ public class TimelineActivity extends AppCompatActivity {
             @Override
             public void onSuccess(int statusCode, Headers headers, JSON json) {
                 // clear out old items
+                if (mAdapter == null) return;
                 Log.d(TAG, "fetchTimelineAsync adapter tweets: " + mAdapter.getItemCount());
                 mAdapter.clear();
 
@@ -124,6 +132,7 @@ public class TimelineActivity extends AppCompatActivity {
                 populateHomeTimeline();
 
                 // signal refresh has finished
+                if (mSwipeContainer == null) return;
                 mSwipeContainer.setRefreshing(false);
             }
 
@@ -143,6 +152,7 @@ public class TimelineActivity extends AppCompatActivity {
                 JSONArray jsonArray = json.jsonArray;
                 try {
                     List<Tweet> ts = Tweet.fromJsonArray(jsonArray);
+                    if (mTweets == null || mAdapter == null) return;
                     mTweets.addAll(ts);
                     mAdapter.notifyDataSetChanged();
                 } catch (JSONException e) {

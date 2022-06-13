@@ -103,7 +103,7 @@ public class TwitterClient extends OAuthBaseClient {
 					Log.i("TwitterClient", "Published tweet says: " + tweet.mBody);
 					Intent intent = new Intent();
 					intent.putExtra("tweet", Parcels.wrap(tweet));
-					activity.setResult(activity.RESULT_OK, intent);
+					activity.setResult(Activity.RESULT_OK, intent);
 					activity.finish(); // close activity and return to the parent
 				} catch (JSONException e) {
 					e.printStackTrace();
