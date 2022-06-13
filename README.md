@@ -2,7 +2,7 @@
 
 **SimpleTweet** is an android app that allows a user to view their Twitter timeline and post a new tweet. The app utilizes [Twitter REST API](https://dev.twitter.com/rest/public).
 
-Time spent: **X** hours spent in total
+Time spent: **18** hours spent in total
 
 ## User Stories
 
@@ -46,14 +46,12 @@ The following **additional** features are implemented:
 
 Here's a walkthrough of implemented user stories:
 
-TODO
-<img src='http://i.imgur.com/link/to/your/gif/file.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
-
-GIF created with [Kap](https://getkap.co/).
+![ezgif com-gif-maker](https://user-images.githubusercontent.com/59301744/173159810-e759f6fa-058b-4875-bf86-b08e51b78d00.gif)
 
 ## Notes
-
-Describe any challenges encountered while building the app.
+- It was a challenging trying to add modularity to the code (a lot of reused callback functions between different buttons and imageviews) 
+- Some of the different ways to interact with intents were confusing (startIntentForActivity, onActivityResult) 
+- It was difficult to make layouts consistent (for me, some of the text fields still overlap with each other / appear in strange places, even with constraints) 
 
 ## Open-source libraries used
 
@@ -62,7 +60,7 @@ Describe any challenges encountered while building the app.
 
 ## License
 
-    Copyright [yyyy] [name of copyright owner]
+    Copyright [2022] [Helena Yang]
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
