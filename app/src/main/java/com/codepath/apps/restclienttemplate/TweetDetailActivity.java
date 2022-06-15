@@ -1,5 +1,6 @@
 package com.codepath.apps.restclienttemplate;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
@@ -153,4 +154,5 @@ public class TweetDetailActivity extends AppCompatActivity {
 
 
     }
+
 }

@@ -200,6 +200,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                     i.putExtra("clickedTweet", Parcels.wrap(tweet));
                     i.putExtra("isReplying", true);
                     mContext.startActivity(i);
+
                 }
             });
 

@@ -53,7 +53,7 @@ public class ComposeActivity extends AppCompatActivity {
                 if (!isTweetValid(tweetContent, activity)) return;
                 // make API call to twitter to publish the tweet
 
-//                Toast.makeText(ComposeActivity.this, tweetContent, Toast.LENGTH_LONG).show();
+                // TODO: add support for the replied tweet to immediately appear on the timeline
                 mClient.publishTweet(tweetContent, null,
                         TwitterClient.getPublishTweetHandler(activity));
             }
